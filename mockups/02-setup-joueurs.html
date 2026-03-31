@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hope — Choix des personnages</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #04040f;
+  --gold: #c8a44a;
+  --gold-light: #f0d070;
+  --text: #d8d0c0;
+  --muted: #60584a;
+  --card-bg: #08081c;
+  --border: rgba(200,164,74,0.2);
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Crimson Text', serif;
+  color: var(--text);
+  min-height: 100vh;
+  background-image: radial-gradient(ellipse 100% 50% at 50% 0%, rgba(15,25,70,0.5) 0%, transparent 60%);
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 48px;
+  border-bottom: 1px solid rgba(200,164,74,0.1);
+}
+
+.page-title {
+  font-family: 'Cinzel', serif;
+}
+
+.page-title .step {
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.page-title h2 {
+  font-size: 24px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.player-count-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count-label {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-right: 8px;
+}
+
+.count-btn {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(200,164,74,0.25);
+  background: rgba(200,164,74,0.06);
+  color: var(--muted);
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+.count-btn.active {
+  background: rgba(200,164,74,0.15);
+  border-color: rgba(200,164,74,0.6);
+  color: var(--gold-light);
+  box-shadow: 0 0 12px rgba(200,164,74,0.15);
+}
+
+.count-btn:hover:not(.active) {
+  border-color: rgba(200,164,74,0.4);
+  color: var(--gold);
+}
+
+/* Grille des personnages */
+.characters-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+  padding: 40px 48px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* Carte personnage */
+.char-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  overflow: hidden;
+}
+
+.char-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent-color, var(--gold)), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.char-card:hover::before,
+.char-card.selected::before { opacity: 1; }
+
+.char-card:hover {
+  border-color: rgba(200,164,74,0.45);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(200,164,74,0.06);
+}
+
+.char-card.selected {
+  border-color: rgba(200,164,74,0.7);
+  box-shadow: 0 0 30px rgba(200,164,74,0.12), inset 0 0 20px rgba(200,164,74,0.04);
+}
+
+.char-card.taken {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Portrait du personnage */
+.char-portrait {
+  aspect-ratio: 3/4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.char-portrait-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.char-portrait-icon {
+  font-size: 64px;
+  z-index: 2;
+  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.8));
+}
+
+.char-portrait-name {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 32px 16px 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+  z-index: 3;
+}
+
+.char-name {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold-light);
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.char-inspiration {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  display: block;
+  margin-top: 3px;
+}
+
+/* Corps de la carte */
+.char-body {
+  padding: 16px;
+  border-top: 1px solid rgba(200,164,74,0.1);
+}
+
+/* Stats de départ */
+.char-stats {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 3px 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.stat-icon { font-size: 11px; }
+.stat-val { font-family: 'Cinzel', serif; color: var(--gold); }
+
+/* Description courte */
+.char-atout {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #9a9080;
+  font-style: italic;
+  border-left: 2px solid rgba(200,164,74,0.2);
+  padding-left: 10px;
+}
+
+/* Sélecteur de joueur */
+.char-claim {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.player-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  padding: 5px 12px;
+  border: 1px solid rgba(200,164,74,0.3);
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.claim-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding: 6px 14px;
+  background: rgba(200,164,74,0.1);
+  border: 1px solid rgba(200,164,74,0.3);
+  color: var(--gold);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.claim-btn:hover {
+  background: rgba(200,164,74,0.2);
+  border-color: rgba(200,164,74,0.6);
+}
+
+/* Couleurs spécifiques */
+.marchand  { --accent-color: #d4a020; }
+.marchand .char-portrait-bg  { background: radial-gradient(ellipse at 50% 70%, #1a1000 0%, #050305 100%); }
+
+.aristocrate { --accent-color: #c040a0; }
+.aristocrate .char-portrait-bg { background: radial-gradient(ellipse at 50% 70%, #1a0018 0%, #050305 100%); }
+
+.receleur { --accent-color: #404040; }
+.receleur .char-portrait-bg { background: radial-gradient(ellipse at 50% 70%, #0a0a0a 0%, #050305 100%); }
+
+.journaliste { --accent-color: #208040; }
+.journaliste .char-portrait-bg { background: radial-gradient(ellipse at 50% 70%, #001810 0%, #050305 100%); }
+
+.medium { --accent-color: #6030c0; }
+.medium .char-portrait-bg { background: radial-gradient(ellipse at 50% 70%, #100018 0%, #050305 100%); }
+
+.heritier { --accent-color: #a04020; }
+.heritier .char-portrait-bg { background: radial-gradient(ellipse at 50% 70%, #1a0800 0%, #050305 100%); }
+
+/* Footer CTA */
+.page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 24px 48px;
+  border-top: 1px solid rgba(200,164,74,0.1);
+  gap: 24px;
+}
+
+.selection-status {
+  font-size: 14px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.selection-status strong {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.btn-next {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  padding: 16px 40px;
+  background: linear-gradient(180deg, rgba(200,164,74,0.12) 0%, rgba(200,164,74,0.06) 100%);
+  border: 1px solid rgba(200,164,74,0.45);
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+.btn-next:hover {
+  background: linear-gradient(180deg, rgba(200,164,74,0.22) 0%, rgba(200,164,74,0.12) 100%);
+  border-color: rgba(200,164,74,0.7);
+  box-shadow: 0 0 20px rgba(200,164,74,0.15);
+  color: var(--gold-light);
+}
+
+.nav-hint {
+  position: fixed;
+  top: 24px;
+  right: 48px;
+  font-size: 12px;
+  color: #3a3030;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.15em;
+}
+
+.nav-hint a { color: #5a5040; text-decoration: none; }
+.nav-hint a:hover { color: var(--gold); }
+</style>
+  </head>
+  <body>
+
+    <header class="page-header">
+      <div class="page-title">
+        <div class="step">Mise en place · Étape 1 / 2</div>
+        <h2>Choisissez votre destin</h2>
+      </div>
+      <div class="player-count-selector">
+        <span class="count-label">Joueurs</span>
+        <button class="count-btn">3</button>
+        <button class="count-btn">4</button>
+        <button class="count-btn active">5</button>
+        <button class="count-btn">6</button>
+      </div>
+    </header>
+
+    <div class="characters-grid">
+
+      <!-- Le Marchand -->
+      <div class="char-card marchand selected">
+        <div class="char-portrait">
+          <div class="char-portrait-bg"></div>
+          <div class="char-portrait-icon">🏛️</div>
+          <div class="char-portrait-name">
+            <span class="char-name">Le Marchand</span>
+            <span class="char-inspiration">Jean-Baptiste Tavernier</span>
+          </div>
+        </div>
+        <div class="char-body">
+          <div class="char-stats">
+            <span class="stat"><span class="stat-icon">📜</span><span
+                class="stat-val">8</span> Livres</span>
+            <span class="stat"><span class="stat-icon">🤝</span><span
+                class="stat-val">1</span> Faveur</span>
+            <span class="stat"><span class="stat-icon">🔍</span><span
+                class="stat-val">1</span> Secret</span>
+          </div>
+          <p class="char-atout">Peut déclencher une Enchère Forcée à tout
+            moment. Le Hope est pour lui une marchandise.</p>
+          <div class="char-claim">
+            <span class="player-tag">Joueur 1</span>
+            <button class="claim-btn">✓ Choisi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- L'Aristocrate -->
+      <div class="char-card aristocrate selected">
+        <div class="char-portrait">
+          <div class="char-portrait-bg"></div>
+          <div class="char-portrait-icon">👑</div>
+          <div class="char-portrait-name">
+            <span class="char-name">L'Aristocrate</span>
+            <span class="char-inspiration">Noblesse française</span>
+          </div>
+        </div>
+        <div class="char-body">
+          <div class="char-stats">
+            <span class="stat"><span class="stat-icon">📜</span><span
+                class="stat-val">4</span> Livres</span>
+            <span class="stat"><span class="stat-icon">🤝</span><span
+                class="stat-val">3</span> Faveurs</span>
+            <span class="stat"><span class="stat-icon">🔍</span><span
+                class="stat-val">1</span> Secret</span>
+          </div>
+          <p class="char-atout">Immunisée contre le premier Événement Funeste.
+            Le rang protège — une fois.</p>
+          <div class="char-claim">
+            <span class="player-tag">Joueur 2</span>
+            <button class="claim-btn">✓ Choisi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Le Receleur -->
+      <div class="char-card receleur selected">
+        <div class="char-portrait">
+          <div class="char-portrait-bg"></div>
+          <div class="char-portrait-icon">🎭</div>
+          <div class="char-portrait-name">
+            <span class="char-name">Le Receleur</span>
+            <span class="char-inspiration">Marché noir, 1792</span>
+          </div>
+        </div>
+        <div class="char-body">
+          <div class="char-stats">
+            <span class="stat"><span class="stat-icon">📜</span><span
+                class="stat-val">3</span> Livres</span>
+            <span class="stat"><span class="stat-icon">🤝</span><span
+                class="stat-val">2</span> Faveurs</span>
+            <span class="stat"><span class="stat-icon">🔍</span><span
+                class="stat-val">3</span> Secrets</span>
+          </div>
+          <p class="char-atout">Peut cacher le Hope un tour entier. Invisi­ble —
+            jusqu'à ce qu'on le découvre.</p>
+          <div class="char-claim">
+            <span class="player-tag">Joueur 3</span>
+            <button class="claim-btn">✓ Choisi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Le Journaliste -->
+      <div class="char-card journaliste selected">
+        <div class="char-portrait">
+          <div class="char-portrait-bg"></div>
+          <div class="char-portrait-icon">🗞️</div>
+          <div class="char-portrait-name">
+            <span class="char-name">Le Journaliste</span>
+            <span class="char-inspiration">Presse américaine, 1900</span>
+          </div>
+        </div>
+        <div class="char-body">
+          <div class="char-stats">
+            <span class="stat"><span class="stat-icon">📜</span><span
+                class="stat-val">2</span> Livres</span>
+            <span class="stat"><span class="stat-icon">🤝</span><span
+                class="stat-val">1</span> Faveur</span>
+            <span class="stat"><span class="stat-icon">🔍</span><span
+                class="stat-val">4</span> Secrets</span>
+          </div>
+          <p class="char-atout">Gagne 2 Gloire chaque fois qu'un Événement
+            frappe une victime qu'il surveille.</p>
+          <div class="char-claim">
+            <span class="player-tag">Joueur 4</span>
+            <button class="claim-btn">✓ Choisi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- La Médium -->
+      <div class="char-card medium selected">
+        <div class="char-portrait">
+          <div class="char-portrait-bg"></div>
+          <div class="char-portrait-icon">🔮</div>
+          <div class="char-portrait-name">
+            <span class="char-name">La Médium</span>
+            <span class="char-inspiration">Diseuses de bonne aventure</span>
+          </div>
+        </div>
+        <div class="char-body">
+          <div class="char-stats">
+            <span class="stat"><span class="stat-icon">📜</span><span
+                class="stat-val">3</span> Livres</span>
+            <span class="stat"><span class="stat-icon">🤝</span><span
+                class="stat-val">2</span> Faveurs</span>
+            <span class="stat"><span class="stat-icon">🔍</span><span
+                class="stat-val">2</span> Secrets</span>
+          </div>
+          <p class="char-atout">Voit le prochain Événement Funeste avant qu'il
+            ne se déclenche. Information ou protection ?</p>
+          <div class="char-claim">
+            <span class="player-tag">Joueur 5</span>
+            <button class="claim-btn">✓ Choisi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- L'Héritier Ruiné -->
+      <div class="char-card heritier">
+        <div class="char-portrait">
+          <div class="char-portrait-bg"></div>
+          <div class="char-portrait-icon">🥀</div>
+          <div class="char-portrait-name">
+            <span class="char-name">L'Héritier Ruiné</span>
+            <span class="char-inspiration">Les derniers Hope</span>
+          </div>
+        </div>
+        <div class="char-body">
+          <div class="char-stats">
+            <span class="stat"><span class="stat-icon">📜</span><span
+                class="stat-val">0</span> Livres</span>
+            <span class="stat"><span class="stat-icon">🤝</span><span
+                class="stat-val">0</span> Faveur</span>
+            <span class="stat"><span class="stat-icon">🔍</span><span
+                class="stat-val">1</span> Secret</span>
+          </div>
+          <p class="char-atout">Double Gloire, triple Malédiction. Seuil fixe à
+            3. Tout ou rien — aucun autre chemin.</p>
+          <div class="char-claim">
+            <span
+              style="font-size:11px;color:#3a3030;font-family:'Cinzel',serif;letter-spacing:0.1em;">Non
+              sélectionné</span>
+            <button class="claim-btn">Choisir</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="page-footer">
+      <span class="selection-status"><strong>5</strong> joueurs sélectionnés sur
+        5</span>
+      <a href="03-setup-seuil.html" class="btn-next">Distribuer les seuils →</a>
+    </footer>
+
+    <div class="nav-hint">
+      <a href="index.html">← Index</a>
+    </div>
+
+  </body>
+</html>

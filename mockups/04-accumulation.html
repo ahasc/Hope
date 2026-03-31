@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hope — Accumulation</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #03030e;
+  --gold: #c8a44a;
+  --gold-light: #f0d070;
+  --curse: #7020c0;
+  --curse-glow: rgba(112,32,192,0.4);
+  --glory: #c8a44a;
+  --diamond: #3070d0;
+  --text: #d8d0c0;
+  --muted: #60584a;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Crimson Text', serif;
+  color: var(--text);
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+}
+
+/* Fond */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(20,40,100,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Header barre de tour */
+.turn-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 1px solid rgba(200,164,74,0.1);
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+}
+
+.turn-info {
+  font-family: 'Cinzel', serif;
+}
+
+.turn-label {
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.turn-number {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--gold);
+}
+
+.phase-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  padding: 6px 16px;
+  border: 1px solid rgba(200,164,74,0.4);
+  color: var(--gold);
+  background: rgba(200,164,74,0.08);
+  text-transform: uppercase;
+}
+
+.events-remaining {
+  text-align: right;
+}
+
+.events-label {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-family: 'Cinzel', serif;
+}
+
+.events-count {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  color: #8b4040;
+  font-weight: 600;
+}
+
+/* Contenu central */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 420px 1fr;
+  gap: 0;
+  align-items: start;
+  padding: 48px;
+  gap: 40px;
+}
+
+/* Panneau gauche — mini-scores */
+.mini-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 20px;
+}
+
+.mini-score-title {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(200,164,74,0.1);
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.02);
+  transition: all 0.3s;
+}
+
+.player-row.active-holder {
+  border-color: rgba(48,112,208,0.4);
+  background: rgba(20,50,120,0.12);
+  box-shadow: 0 0 20px rgba(30,60,160,0.1);
+}
+
+.player-row.danger {
+  border-color: rgba(140,0,0,0.4);
+  background: rgba(80,0,0,0.1);
+  animation: danger-pulse 2s ease-in-out infinite;
+}
+
+@keyframes danger-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(180,0,0,0); }
+  50% { box-shadow: 0 0 15px rgba(180,0,0,0.2); }
+}
+
+.player-indicator {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+.player-row.active-holder .player-indicator {
+  background: var(--diamond);
+  box-shadow: 0 0 8px rgba(48,112,208,0.8);
+  animation: indicator-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes indicator-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.player-row-name {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-row.active-holder .player-row-name { color: var(--gold-light); }
+
+.player-row-stats {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+}
+
+.mini-stat .icon { font-size: 10px; }
+.glory-val { color: var(--gold); font-family: 'Cinzel', serif; }
+.curse-val  { color: var(--curse); font-family: 'Cinzel', serif; }
+
+.diamond-badge {
+  font-size: 14px;
+  filter: drop-shadow(0 0 4px rgba(48,112,208,0.8));
+}
+
+/* Zone centrale — le détenteur du Hope */
+.holder-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.phase-title {
+  text-align: center;
+}
+
+.phase-title-pre {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.5em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.phase-title-main {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--gold);
+  margin-top: 6px;
+  letter-spacing: 0.05em;
+}
+
+/* Diamond central */
+.hope-diamond {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diamond-aura {
+  position: absolute;
+  width: 160px; height: 160px;
+  background: radial-gradient(ellipse, rgba(48,112,208,0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: aura-pulse 3s ease-in-out infinite;
+}
+
+@keyframes aura-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+.diamond-svg-wrap {
+  position: relative;
+  z-index: 2;
+  width: 100px; height: 100px;
+  filter: drop-shadow(0 0 20px rgba(48,112,208,0.8)) drop-shadow(0 0 50px rgba(20,60,200,0.4));
+}
+
+.diamond-svg-wrap svg { width: 100%; height: 100%; }
+
+/* Card du détenteur */
+.holder-card {
+  background: rgba(8,8,28,0.8);
+  border: 1px solid rgba(48,112,208,0.3);
+  padding: 28px 32px;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 0 30px rgba(20,50,140,0.1);
+}
+
+.holder-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--diamond), transparent);
+  opacity: 0.6;
+}
+
+.holder-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.5em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.holder-name {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--gold-light);
+}
+
+.holder-role {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Malédiction */
+.curse-section {
+  width: 100%;
+}
+
+.curse-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.curse-tokens {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.curse-token {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(112,32,192,0.4);
+  background: radial-gradient(ellipse, rgba(80,20,140,0.6) 0%, rgba(40,10,80,0.4) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 0 10px rgba(112,32,192,0.3);
+}
+
+.curse-token.empty {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.06);
+  box-shadow: none;
+}
+
+.curse-counter {
+  text-align: center;
+  margin-top: 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: #8040c0;
+  letter-spacing: 0.2em;
+}
+
+.curse-counter strong {
+  font-size: 18px;
+  color: #9040d0;
+}
+
+/* Gains du tour */
+.gains {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.gain-item {
+  flex: 1;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+  text-align: center;
+}
+
+.gain-item.positive { border-color: rgba(200,164,74,0.2); background: rgba(200,164,74,0.04); }
+.gain-item.negative { border-color: rgba(112,32,192,0.2); background: rgba(112,32,192,0.04); }
+
+.gain-icon { font-size: 20px; margin-bottom: 6px; }
+.gain-value {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.gain-item.positive .gain-value { color: var(--gold); }
+.gain-item.negative .gain-value { color: #8040c0; }
+
+.gain-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Alerte seuil */
+.threshold-warning {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid rgba(160,20,20,0.5);
+  background: rgba(80,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: warning-flash 1.5s ease-in-out infinite;
+}
+
+@keyframes warning-flash {
+  0%, 100% { border-color: rgba(160,20,20,0.5); box-shadow: 0 0 0 rgba(200,0,0,0); }
+  50% { border-color: rgba(200,20,20,0.8); box-shadow: 0 0 20px rgba(200,0,0,0.15); }
+}
+
+.warning-icon { font-size: 24px; }
+.warning-text { font-size: 15px; }
+.warning-text strong { color: #cc4444; font-family: 'Cinzel', serif; }
+
+/* Panneau droit — actions */
+.actions-panel {
+  padding-top: 20px;
+}
+
+.actions-title {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(200,164,74,0.1);
+}
+
+.action-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  margin-bottom: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s;
+  text-align: left;
+  position: relative;
+}
+
+.action-btn .arrow {
+  position: absolute;
+  right: 16px;
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+
+.action-btn:hover .arrow { right: 10px; opacity: 1; }
+
+.btn-primary {
+  background: linear-gradient(180deg, rgba(200,164,74,0.14) 0%, rgba(200,164,74,0.07) 100%);
+  border: 1px solid rgba(200,164,74,0.45);
+  color: var(--gold);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, rgba(200,164,74,0.22) 0%, rgba(200,164,74,0.12) 100%);
+  border-color: rgba(200,164,74,0.7);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--muted);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(200,164,74,0.2);
+  color: var(--text);
+}
+
+.btn-danger {
+  background: rgba(100,0,0,0.15);
+  border: 1px solid rgba(140,20,20,0.4);
+  color: #cc4444;
+}
+
+.btn-danger:hover {
+  background: rgba(100,0,0,0.25);
+  border-color: rgba(180,30,30,0.6);
+}
+
+.action-hint {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.5;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  margin-top: 8px;
+}
+
+.nav-hint {
+  position: fixed;
+  top: 24px;
+  right: 48px;
+  font-size: 12px;
+  color: #3a3030;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.15em;
+  z-index: 30;
+}
+
+.nav-hint a { color: #5a5040; text-decoration: none; }
+.nav-hint a:hover { color: var(--gold); }
+</style>
+  </head>
+  <body>
+
+    <!-- Header -->
+    <div class="turn-bar">
+      <div class="turn-info">
+        <div class="turn-label">Tour</div>
+        <div class="turn-number">3 / 8</div>
+      </div>
+      <div class="phase-badge">Phase 1 — Accumulation</div>
+      <div class="events-remaining">
+        <div class="events-label">Cartes Événement</div>
+        <div class="events-count">18 restantes</div>
+      </div>
+    </div>
+
+    <!-- Contenu -->
+    <div class="main">
+
+      <!-- Gauche : mini scores -->
+      <div class="mini-scores">
+        <div class="mini-score-title">Joueurs</div>
+
+        <div class="player-row active-holder">
+          <div class="player-indicator"></div>
+          <div class="player-row-name">Thomas</div>
+          <div class="player-row-stats">
+            <div class="mini-stat"><span class="icon">⭐</span><span
+                class="glory-val">4</span></div>
+            <div class="mini-stat"><span class="icon">💜</span><span
+                class="curse-val">3</span></div>
+            <div class="diamond-badge">💎</div>
+          </div>
+        </div>
+
+        <div class="player-row">
+          <div class="player-indicator"></div>
+          <div class="player-row-name">Isabelle</div>
+          <div class="player-row-stats">
+            <div class="mini-stat"><span class="icon">⭐</span><span
+                class="glory-val">6</span></div>
+            <div class="mini-stat"><span class="icon">💜</span><span
+                class="curse-val">1</span></div>
+          </div>
+        </div>
+
+        <div class="player-row danger">
+          <div class="player-indicator"></div>
+          <div class="player-row-name">Marcus</div>
+          <div class="player-row-stats">
+            <div class="mini-stat"><span class="icon">⭐</span><span
+                class="glory-val">2</span></div>
+            <div class="mini-stat"><span class="icon">💜</span><span
+                class="curse-val" style="color:#cc4444">2</span></div>
+          </div>
+        </div>
+
+        <div class="player-row">
+          <div class="player-indicator"></div>
+          <div class="player-row-name">Chloé</div>
+          <div class="player-row-stats">
+            <div class="mini-stat"><span class="icon">⭐</span><span
+                class="glory-val">5</span></div>
+            <div class="mini-stat"><span class="icon">💜</span><span
+                class="curse-val">0</span></div>
+          </div>
+        </div>
+
+        <div class="player-row">
+          <div class="player-indicator"></div>
+          <div class="player-row-name">Antoine</div>
+          <div class="player-row-stats">
+            <div class="mini-stat"><span class="icon">⭐</span><span
+                class="glory-val">3</span></div>
+            <div class="mini-stat"><span class="icon">💜</span><span
+                class="curse-val">2</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Centre : le détenteur -->
+      <div class="holder-zone">
+
+        <div class="phase-title">
+          <div class="phase-title-pre">Le Diamand Hope est en possession
+            de</div>
+          <div class="phase-title-main">Accumulation des ressources</div>
+        </div>
+
+        <div class="hope-diamond">
+          <div class="diamond-aura"></div>
+          <div class="diamond-svg-wrap">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <lineargradient id="dg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0a2060" />
+                  <stop offset="30%" stop-color="#1a4a9a" />
+                  <stop offset="55%" stop-color="#4080e0" />
+                  <stop offset="70%" stop-color="#6090f0" />
+                  <stop offset="100%" stop-color="#0a1840" />
+                </lineargradient>
+              </defs>
+              <polygon points="50,5 95,38 75,95 25,95 5,38" fill="url(#dg)" />
+              <polygon points="50,5 95,38 50,40" fill="rgba(120,180,255,0.3)" />
+              <polygon points="5,38 50,40 25,95" fill="rgba(20,60,160,0.35)" />
+              <polygon points="95,38 75,95 50,40" fill="rgba(10,30,100,0.45)" />
+              <polygon points="50,5 95,38 75,95 25,95 5,38" fill="none"
+                stroke="rgba(100,160,255,0.5)" stroke-width="0.7" />
+              <line x1="50" y1="5" x2="50" y2="40"
+                stroke="rgba(150,200,255,0.35)" stroke-width="0.5" />
+              <line x1="5" y1="38" x2="95" y2="38"
+                stroke="rgba(150,200,255,0.2)" stroke-width="0.5" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="holder-card">
+          <div class="holder-label">Détenteur du Diamand Hope</div>
+          <div class="holder-name">Thomas</div>
+          <div class="holder-role">Le Marchand</div>
+        </div>
+
+        <!-- Gains ce tour -->
+        <div class="gains">
+          <div class="gain-item positive">
+            <div class="gain-icon">⭐</div>
+            <div class="gain-value">+1</div>
+            <div class="gain-label">Gloire gagnée</div>
+          </div>
+          <div class="gain-item negative">
+            <div class="gain-icon">💜</div>
+            <div class="gain-value">+1</div>
+            <div class="gain-label">Malédiction reçue</div>
+          </div>
+        </div>
+
+        <!-- Jetons malédiction -->
+        <div class="curse-section">
+          <div class="curse-label">Malédictions accumulées</div>
+          <div class="curse-tokens">
+            <div class="curse-token">💜</div>
+            <div class="curse-token">💜</div>
+            <div class="curse-token">💜</div>
+            <div class="curse-token">💜</div>
+            <div class="curse-token empty"></div>
+            <div class="curse-token empty"></div>
+          </div>
+          <div class="curse-counter">
+            Total : <strong>4</strong> jetons · Seuil : ??? (secret)
+          </div>
+        </div>
+
+        <!-- Avertissement -->
+        <div class="threshold-warning">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-text">
+            <strong>Attention !</strong> Thomas est à 4 jetons. Son seuil est
+            peut-être atteint.
+            Il doit révéler sa Carte Seuil maintenant.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Droite : actions -->
+      <div class="actions-panel">
+        <div class="actions-title">Actions</div>
+
+        <a href="06-evenement.html" class="action-btn btn-danger">
+          ⚡ Déclencher l'Événement <span class="arrow">→</span>
+        </a>
+
+        <a href="05-marche-noir.html" class="action-btn btn-primary">
+          Passer au Marché Noir <span class="arrow">→</span>
+        </a>
+
+        <a href="08-vue-privee.html" class="action-btn btn-secondary">
+          👁 Vue privée d'un joueur <span class="arrow">→</span>
+        </a>
+
+        <a href="09-scoreboard.html" class="action-btn btn-secondary">
+          📊 Tableau de bord complet <span class="arrow">→</span>
+        </a>
+
+        <p class="action-hint">
+          Thomas doit annoncer son total de Malédictions à voix haute avant de
+          continuer. Si son seuil est atteint ou dépassé, l'Événement Funeste se
+          déclenche avant le Marché Noir.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="nav-hint">
+      <a href="index.html">← Index</a>
+    </div>
+
+  </body>
+</html>

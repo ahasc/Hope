@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hope — Fin de Partie</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #03030c;
+  --gold: #c8a44a;
+  --gold-light: #f0d070;
+  --text: #d8d0c0;
+  --muted: #60584a;
+  --surface: #070712;
+  --diamond: #3070d0;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Crimson Text', serif;
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Fond dramatique */
+.bg-aura {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(30,20,5,0.5) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Particules dorées */
+.confetti-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  animation: confetti-fall linear infinite;
+  opacity: 0;
+}
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* Header minimal */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 48px;
+  border-bottom: 1px solid rgba(200,164,74,0.1);
+}
+
+.header-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+}
+
+.turn-info {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Zone du vainqueur */
+.winner-zone {
+  padding: 64px 48px 48px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.winner-pretext {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.6em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* Couronne animée */
+.crown {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 20px rgba(200,164,74,0.6));
+  animation: crown-float 3s ease-in-out infinite;
+}
+
+@keyframes crown-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.winner-name {
+  font-family: 'Cinzel', serif;
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  background: linear-gradient(180deg, #fff8e0 0%, #f0d070 25%, #c8a44a 60%, #8b6914 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(200,164,74,0.4));
+  line-height: 1;
+}
+
+.winner-role {
+  font-size: 22px;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.victory-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 10px 24px;
+  border: 1px solid rgba(200,164,74,0.35);
+  background: rgba(200,164,74,0.07);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.victory-quote {
+  margin-top: 24px;
+  font-size: 18px;
+  font-style: italic;
+  color: #5a5040;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
+}
+
+/* Ornement */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  margin: 40px 0;
+}
+
+.orn-line {
+  flex: 1;
+  max-width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,164,74,0.3));
+}
+
+.orn-line:last-child { background: linear-gradient(90deg, rgba(200,164,74,0.3), transparent); }
+.orn-diamond { width: 8px; height: 8px; background: rgba(200,164,74,0.5); transform: rotate(45deg); }
+
+/* Décompte final */
+.final-scores {
+  padding: 0 48px 48px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.fs-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.5em;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.score-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 80px 80px 80px 120px;
+  gap: 0;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid rgba(200,164,74,0.1);
+  padding: 0;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.score-row.winner-row {
+  border-color: rgba(200,164,74,0.4);
+  background: rgba(200,164,74,0.05);
+}
+
+.score-row.winner-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--gold);
+}
+
+.score-row.eliminated {
+  opacity: 0.4;
+  border-color: rgba(160,30,30,0.2);
+}
+
+.rank-cell {
+  padding: 14px 0;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.rank-1st { color: var(--gold-light); }
+.rank-2nd { color: #c0c0c0; }
+.rank-3rd { color: #c08040; }
+.rank-rest { color: #3a3028; }
+
+.name-cell {
+  padding: 14px 16px;
+}
+
+.row-name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--text);
+  display: block;
+}
+
+.row-role { font-size: 13px; font-style: italic; color: var(--muted); }
+
+.score-cell {
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.sc-val {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  display: block;
+}
+
+.sc-label { font-size: 10px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; display: block; margin-top: 2px; }
+
+.glory-val { color: var(--gold); }
+.glory-val.winner { color: var(--gold-light); }
+.curse-val { color: #7020c0; }
+.bonus-val { color: #60c060; }
+
+.final-total {
+  padding: 14px 16px;
+  text-align: right;
+}
+
+.total-num {
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
+  font-weight: 900;
+  display: block;
+}
+
+.total-num.winner { color: var(--gold-light); filter: drop-shadow(0 0 8px rgba(200,164,74,0.5)); }
+.total-num.rest   { color: var(--text); }
+
+.total-label { font-size: 10px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+
+/* Malédiction du dernier détenteur */
+.curse-finale {
+  max-width: 900px;
+  margin: 0 auto 40px;
+  width: 100%;
+  padding: 0 48px;
+}
+
+.curse-final-block {
+  border: 1px solid rgba(160,30,30,0.3);
+  background: rgba(40,0,0,0.2);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cf-icon { font-size: 24px; }
+.cf-text { font-size: 15px; color: #a06060; line-height: 1.6; }
+.cf-text strong { color: #e06060; font-family: 'Cinzel', serif; }
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 48px;
+  gap: 20px;
+  border-top: 1px solid rgba(200,164,74,0.1);
+  margin-top: auto;
+}
+
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  padding: 14px 36px;
+  text-decoration: none;
+  text-transform: uppercase;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-gold {
+  border-color: rgba(200,164,74,0.5);
+  color: var(--gold);
+  background: rgba(200,164,74,0.1);
+}
+.btn-gold:hover { background: rgba(200,164,74,0.18); border-color: rgba(200,164,74,0.8); color: var(--gold-light); }
+
+.btn-ghost { border-color: rgba(255,255,255,0.08); color: var(--muted); background: none; }
+.btn-ghost:hover { border-color: rgba(200,164,74,0.25); color: var(--text); }
+
+.nav-hint {
+  position: fixed;
+  top: 24px;
+  right: 48px;
+  font-size: 12px;
+  color: #3a3030;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.15em;
+  z-index: 30;
+}
+.nav-hint a { color: #5a5040; text-decoration: none; }
+.nav-hint a:hover { color: var(--gold); }
+</style>
+  </head>
+  <body>
+
+    <div class="bg-aura"></div>
+
+    <!-- Particules -->
+    <div class="confetti-field">
+      <div class="confetti-piece"
+        style="left:5%;animation-duration:4s;animation-delay:0s;"></div>
+      <div class="confetti-piece"
+        style="left:15%;animation-duration:5s;animation-delay:0.5s;width:2px;height:6px;"></div>
+      <div class="confetti-piece"
+        style="left:28%;animation-duration:3.5s;animation-delay:1s;background:rgba(200,164,74,0.5);"></div>
+      <div class="confetti-piece"
+        style="left:42%;animation-duration:6s;animation-delay:0.2s;width:4px;height:4px;"></div>
+      <div class="confetti-piece"
+        style="left:58%;animation-duration:4.5s;animation-delay:1.5s;"></div>
+      <div class="confetti-piece"
+        style="left:70%;animation-duration:5.5s;animation-delay:0.8s;background:rgba(180,140,40,0.6);"></div>
+      <div class="confetti-piece"
+        style="left:82%;animation-duration:4s;animation-delay:2s;width:2px;height:8px;"></div>
+      <div class="confetti-piece"
+        style="left:92%;animation-duration:3.8s;animation-delay:0.3s;"></div>
+      <div class="confetti-piece"
+        style="left:35%;animation-duration:7s;animation-delay:1.2s;background:rgba(150,120,30,0.5);"></div>
+      <div class="confetti-piece"
+        style="left:65%;animation-duration:4.2s;animation-delay:2.5s;width:5px;height:2px;"></div>
+    </div>
+
+    <div class="header">
+      <div class="header-logo">Hope</div>
+      <div class="turn-info">Fin de partie · Tour 8</div>
+    </div>
+
+    <!-- Vainqueur -->
+    <div class="winner-zone">
+      <div class="winner-pretext">Et il ne reste qu'un·e</div>
+      <span class="crown">👑</span>
+      <div class="winner-name">Isabelle</div>
+      <div class="winner-role">Le Receleur</div>
+      <div class="victory-type">⭐ Victoire en Gloire</div>
+      <p class="victory-quote">
+        "Elle a circulé dans l'ombre pendant toute la partie, dissimulant le Hope au moment précis où les autres s'effondraient."
+      </p>
+    </div>
+
+    <div class="ornament">
+      <div class="orn-line"></div>
+      <div class="orn-diamond"></div>
+      <div class="orn-diamond"
+        style="opacity:0.5;transform:rotate(45deg) scale(0.6)"></div>
+      <div class="orn-diamond"></div>
+      <div class="orn-line"></div>
+    </div>
+
+    <!-- Malédiction finale -->
+    <div class="curse-finale">
+      <div class="curse-final-block">
+        <div class="cf-icon">💀</div>
+        <div class="cf-text">
+          <strong>Malédiction du dernier détenteur :</strong> Marcus tenait le
+          Hope au moment de la fin de partie.
+          Il a subi un dernier Événement Funeste automatique — La Disgrâce —
+          perdant 2 points de Gloire finaux.
+        </div>
+      </div>
+    </div>
+
+    <!-- Décompte -->
+    <div class="final-scores">
+      <div class="fs-title">Décompte final</div>
+
+      <div class="score-rows">
+
+        <!-- Isabelle — 1ère -->
+        <div class="score-row winner-row">
+          <div class="rank-cell rank-1st">1</div>
+          <div class="name-cell">
+            <span class="row-name">Isabelle</span>
+            <span class="row-role">Le Receleur</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val glory-val winner">10</span>
+            <span class="sc-label">Gloire</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val curse-val">2</span>
+            <span class="sc-label">Malédiction</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val bonus-val">+5</span>
+            <span class="sc-label">Bonus Receleur</span>
+          </div>
+          <div class="final-total">
+            <span class="total-num winner">15</span>
+            <span class="total-label">Points totaux</span>
+          </div>
+        </div>
+
+        <!-- Chloé — 2e -->
+        <div class="score-row">
+          <div class="rank-cell rank-2nd">2</div>
+          <div class="name-cell">
+            <span class="row-name">Chloé</span>
+            <span class="row-role">La Médium</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val glory-val">9</span>
+            <span class="sc-label">Gloire</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val curse-val">1</span>
+            <span class="sc-label">Malédiction</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val" style="color:#3a3028">—</span>
+            <span class="sc-label">Bonus</span>
+          </div>
+          <div class="final-total">
+            <span class="total-num rest">9</span>
+            <span class="total-label">Points totaux</span>
+          </div>
+        </div>
+
+        <!-- Thomas — 3e -->
+        <div class="score-row">
+          <div class="rank-cell rank-3rd">3</div>
+          <div class="name-cell">
+            <span class="row-name">Thomas</span>
+            <span class="row-role">Le Marchand</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val glory-val">8</span>
+            <span class="sc-label">Gloire</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val curse-val">3</span>
+            <span class="sc-label">Malédiction</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val" style="color:#3a3028">—</span>
+            <span class="sc-label">Bonus</span>
+          </div>
+          <div class="final-total">
+            <span class="total-num rest">8</span>
+            <span class="total-label">Points totaux</span>
+          </div>
+        </div>
+
+        <!-- Antoine — 4e -->
+        <div class="score-row">
+          <div class="rank-cell rank-rest">4</div>
+          <div class="name-cell">
+            <span class="row-name" style="color:var(--muted)">Antoine</span>
+            <span class="row-role">Le Journaliste</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val" style="color:var(--muted)">7</span>
+            <span class="sc-label">Gloire</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val curse-val" style="opacity:0.5">0</span>
+            <span class="sc-label">Malédiction</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val" style="color:#3a3028">—</span>
+            <span class="sc-label">Bonus</span>
+          </div>
+          <div class="final-total">
+            <span class="total-num rest" style="color:var(--muted)">7</span>
+            <span class="total-label">Points totaux</span>
+          </div>
+        </div>
+
+        <!-- Marcus — éliminé -->
+        <div class="score-row eliminated">
+          <div class="rank-cell rank-rest">5</div>
+          <div class="name-cell">
+            <span class="row-name" style="color:#6a4040">Marcus ☠</span>
+            <span class="row-role">L'Héritier Ruiné</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val" style="color:#6a4040">2</span>
+            <span class="sc-label">Gloire</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val" style="color:#8a3030">3</span>
+            <span class="sc-label">Malédiction</span>
+          </div>
+          <div class="score-cell">
+            <span class="sc-val" style="color:#cc3030">−2</span>
+            <span class="sc-label">Malédiction finale</span>
+          </div>
+          <div class="final-total">
+            <span class="total-num rest" style="color:#6a4040">0</span>
+            <span class="total-label">Éliminé</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <footer class="footer">
+      <a href="01-accueil.html" class="btn btn-gold">Nouvelle partie</a>
+      <a href="index.html" class="btn btn-ghost">← Index des maquettes</a>
+    </footer>
+
+    <div class="nav-hint">
+      <a href="index.html">← Index</a>
+    </div>
+
+  </body>
+</html>

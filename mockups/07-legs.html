@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hope — Le Legs</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #03030c;
+  --gold: #c8a44a;
+  --gold-light: #f0d070;
+  --text: #d8d0c0;
+  --muted: #60584a;
+  --surface: #080818;
+  --border: rgba(200,164,74,0.15);
+  --diamond: #3070d0;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Crimson Text', serif;
+  color: var(--text);
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 1px solid rgba(200,164,74,0.1);
+}
+
+.phase-info { font-family: 'Cinzel', serif; }
+.phase-step { font-size: 11px; letter-spacing: 0.4em; color: var(--muted); text-transform: uppercase; }
+.phase-name { font-size: 22px; font-weight: 600; color: var(--gold); margin-top: 4px; }
+
+.turn-status {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  padding: 8px 20px;
+  border: 1px solid rgba(200,164,74,0.3);
+  color: var(--gold);
+  background: rgba(200,164,74,0.06);
+  text-transform: uppercase;
+}
+
+/* Layout principal */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 200px 1fr;
+  gap: 0;
+  padding: 48px;
+  align-items: start;
+  gap: 40px;
+}
+
+/* ========= CÔTÉ GAUCHE — Détenteur ========= */
+.holder-side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.side-title {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.5em;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(200,164,74,0.1);
+}
+
+/* Profil joueur */
+.player-profile {
+  background: var(--surface);
+  border: 1px solid rgba(48,112,208,0.3);
+  padding: 24px;
+  position: relative;
+}
+
+.player-profile::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--diamond), transparent);
+  opacity: 0.6;
+}
+
+.profile-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile-icon { font-size: 40px; }
+
+.profile-info { flex: 1; }
+.profile-name {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #80b0ff;
+  display: block;
+}
+.profile-role {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+
+.hope-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  padding: 6px 12px;
+  border: 1px solid rgba(48,112,208,0.4);
+  background: rgba(20,50,120,0.2);
+  color: #6090d0;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Ressources disponibles */
+.resources-available {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.res-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.res-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.02);
+}
+
+.res-icon { font-size: 16px; }
+.res-name { font-size: 14px; color: var(--text); flex: 1; }
+.res-count {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+.res-count.gold { color: var(--gold); }
+.res-count.green { color: #60c060; }
+.res-count.red { color: #c06060; }
+
+/* Offre proposée */
+.offer-builder {
+  background: rgba(200,164,74,0.04);
+  border: 1px dashed rgba(200,164,74,0.25);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.offer-title {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.offer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.offer-item {
+  padding: 8px 14px;
+  border: 1px solid rgba(200,164,74,0.3);
+  background: rgba(200,164,74,0.08);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--gold);
+}
+
+.offer-placeholder {
+  font-size: 14px;
+  font-style: italic;
+  color: #3a3028;
+  padding: 8px 0;
+}
+
+/* Forcer avec Faveur */
+.force-option {
+  padding: 14px;
+  border: 1px solid rgba(200,60,60,0.25);
+  background: rgba(60,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.force-icon { font-size: 20px; }
+.force-text { flex: 1; font-size: 14px; color: #a05050; line-height: 1.5; }
+.force-text strong { color: #cc5050; font-family: 'Cinzel', serif; }
+.force-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  padding: 8px 16px;
+  border: 1px solid rgba(160,30,30,0.4);
+  background: rgba(60,0,0,0.3);
+  color: #cc4444;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+/* ========= CENTRE — Diamant ========= */
+.diamond-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 40px;
+}
+
+.diamond-wrap {
+  position: relative;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diamond-aura {
+  position: absolute;
+  width: 140px; height: 140px;
+  background: radial-gradient(ellipse, rgba(48,112,208,0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: aura 3s ease-in-out infinite;
+}
+
+@keyframes aura {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.diamond-svg {
+  width: 80px; height: 80px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 15px rgba(48,112,208,0.8));
+}
+
+.diamond-svg svg { width: 100%; height: 100%; }
+
+.arrow-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: arrow-bounce 2s ease-in-out infinite;
+}
+
+@keyframes arrow-bounce {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+.arrow-line {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(200,164,74,0.2), rgba(200,164,74,0.6));
+}
+
+.arrow-tip {
+  font-size: 14px;
+  color: var(--gold);
+  opacity: 0.7;
+}
+
+.center-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: #3a3028;
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+
+/* ========= CÔTÉ DROIT — Destinataires ========= */
+.recipients-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recipient-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recipient-card:hover {
+  border-color: rgba(200,164,74,0.4);
+  background: rgba(200,164,74,0.04);
+  transform: translateX(4px);
+}
+
+.recipient-card.selected {
+  border-color: rgba(200,164,74,0.6);
+  background: rgba(200,164,74,0.07);
+  box-shadow: 0 0 20px rgba(200,164,74,0.08);
+}
+
+.recipient-card.selected::before {
+  content: '✓';
+  position: absolute;
+  top: 12px; right: 14px;
+  font-size: 14px;
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+}
+
+.recipient-card.refused {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+  border-color: rgba(100,30,30,0.3);
+}
+
+.recipient-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recipient-name {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  color: var(--gold-light);
+  flex: 1;
+}
+
+.recipient-role {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.recipient-scores {
+  display: flex;
+  gap: 12px;
+}
+
+.rscore {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.rscore .val {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+}
+
+.rscore.glory .val { color: var(--gold); }
+.rscore.curse .val  { color: #8040c0; }
+
+/* Statut de l'acceptation */
+.acceptance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.acceptance-status {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.acceptance-status.accepting { color: #60c060; }
+.acceptance-status.refusing  { color: #c06060; }
+.acceptance-status.negotiating { color: #c0a040; }
+
+.accept-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  padding: 5px 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.badge-green {
+  border: 1px solid rgba(60,160,60,0.4);
+  background: rgba(20,80,20,0.2);
+  color: #60c060;
+}
+
+.badge-red {
+  border: 1px solid rgba(160,40,40,0.4);
+  background: rgba(60,0,0,0.2);
+  color: #c06060;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-top: 1px solid rgba(200,164,74,0.1);
+}
+
+.footer-warning {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+  max-width: 500px;
+}
+
+.footer-actions { display: flex; gap: 12px; }
+
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  padding: 13px 28px;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.3s;
+}
+
+.btn-ghost { border-color: rgba(255,255,255,0.08); color: var(--muted); background: none; }
+.btn-ghost:hover { border-color: rgba(200,164,74,0.3); color: var(--text); }
+
+.btn-gold {
+  border-color: rgba(200,164,74,0.45);
+  color: var(--gold);
+  background: rgba(200,164,74,0.08);
+}
+.btn-gold:hover {
+  border-color: rgba(200,164,74,0.7);
+  background: rgba(200,164,74,0.15);
+  color: var(--gold-light);
+}
+
+.nav-hint {
+  position: fixed;
+  top: 24px;
+  right: 48px;
+  font-size: 12px;
+  color: #3a3030;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.15em;
+  z-index: 30;
+}
+.nav-hint a { color: #5a5040; text-decoration: none; }
+.nav-hint a:hover { color: var(--gold); }
+</style>
+  </head>
+  <body>
+
+    <div class="header">
+      <div class="phase-info">
+        <div class="phase-step">Tour 3 · Phase 4</div>
+        <div class="phase-name">Le Legs</div>
+      </div>
+      <div class="turn-status">Thomas passe le Hope</div>
+    </div>
+
+    <div class="main">
+
+      <!-- Gauche : détenteur -->
+      <div class="holder-side">
+        <div class="side-title">Détenteur actuel</div>
+
+        <div class="player-profile">
+          <div class="profile-top">
+            <div class="profile-icon">🏛️</div>
+            <div class="profile-info">
+              <span class="profile-name">Thomas</span>
+              <span class="profile-role">Le Marchand</span>
+            </div>
+            <div class="hope-tag">💎 Hope</div>
+          </div>
+
+          <div class="resources-available">
+            <div class="res-label">Peut offrir</div>
+            <div class="res-row">
+              <span class="res-icon">📜</span>
+              <span class="res-name">Livres</span>
+              <span class="res-count gold">5</span>
+            </div>
+            <div class="res-row">
+              <span class="res-icon">🤝</span>
+              <span class="res-name">Faveurs</span>
+              <span class="res-count green">2</span>
+            </div>
+            <div class="res-row">
+              <span class="res-icon">🔍</span>
+              <span class="res-name">Secrets</span>
+              <span class="res-count red">1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offre proposée -->
+        <div class="offer-builder">
+          <div class="offer-title">Offre actuelle</div>
+          <div class="offer-row">
+            <div class="offer-item">📜 3 Livres</div>
+            <div class="offer-item">🤝 1 Faveur</div>
+          </div>
+          <div style="font-size:12px;color:#4a4038;font-style:italic">
+            Thomas offre 3 Livres et 1 Faveur pour passer le Hope à un preneur
+            volontaire.
+          </div>
+        </div>
+
+        <!-- Option forcer -->
+        <div class="force-option">
+          <div class="force-icon">⚡</div>
+          <div class="force-text">
+            Utiliser une <strong>Faveur</strong> pour forcer un joueur à prendre
+            le Hope, sans son consentement.
+          </div>
+          <button class="force-btn">Forcer</button>
+        </div>
+      </div>
+
+      <!-- Centre : flèche + diamant -->
+      <div class="diamond-center">
+        <div class="diamond-wrap">
+          <div class="diamond-aura"></div>
+          <div class="diamond-svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <lineargradient id="dg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0a2060" />
+                  <stop offset="40%" stop-color="#1a4a9a" />
+                  <stop offset="60%" stop-color="#4080e0" />
+                  <stop offset="100%" stop-color="#0a1840" />
+                </lineargradient>
+              </defs>
+              <polygon points="50,5 95,38 75,95 25,95 5,38" fill="url(#dg)" />
+              <polygon points="50,5 95,38 50,40" fill="rgba(120,180,255,0.3)" />
+              <polygon points="50,5 95,38 75,95 25,95 5,38" fill="none"
+                stroke="rgba(100,160,255,0.5)" stroke-width="0.8" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="arrow-area">
+          <div class="arrow-line"></div>
+          <div class="arrow-tip">→</div>
+        </div>
+
+        <div class="center-label">
+          Qui prend<br>le fardeau ?
+        </div>
+      </div>
+
+      <!-- Droite : destinataires -->
+      <div class="recipients-side">
+        <div class="side-title">Destinataires possibles</div>
+
+        <!-- Isabelle : veut bien -->
+        <div class="recipient-card selected">
+          <div class="recipient-top">
+            <div>
+              <div class="recipient-name">Isabelle</div>
+              <div class="recipient-role">Le Receleur</div>
+            </div>
+            <div class="recipient-scores">
+              <div class="rscore glory"><span class="val">6</span> ⭐</div>
+              <div class="rscore curse"><span class="val">1</span> 💜</div>
+            </div>
+          </div>
+          <div class="acceptance">
+            <span class="acceptance-status accepting">✓ Accepte l'offre de
+              Thomas</span>
+            <span class="accept-badge badge-green">Confirmé</span>
+          </div>
+        </div>
+
+        <!-- Marcus : hésite -->
+        <div class="recipient-card">
+          <div class="recipient-top">
+            <div>
+              <div class="recipient-name">Marcus</div>
+              <div class="recipient-role">L'Héritier Ruiné</div>
+            </div>
+            <div class="recipient-scores">
+              <div class="rscore glory"><span class="val">2</span> ⭐</div>
+              <div class="rscore curse"><span class="val"
+                  style="color:#cc4444">2</span> 💜</div>
+            </div>
+          </div>
+          <div class="acceptance">
+            <span class="acceptance-status negotiating">⟳ Exige 5 Livres + 1
+              Faveur</span>
+            <span class="accept-badge badge-red">Contre-offre</span>
+          </div>
+        </div>
+
+        <!-- Chloé : refuse -->
+        <div class="recipient-card refused">
+          <div class="recipient-top">
+            <div>
+              <div class="recipient-name">Chloé</div>
+              <div class="recipient-role">La Médium</div>
+            </div>
+            <div class="recipient-scores">
+              <div class="rscore glory"><span class="val">5</span> ⭐</div>
+              <div class="rscore curse"><span class="val">0</span> 💜</div>
+            </div>
+          </div>
+          <div class="acceptance">
+            <span class="acceptance-status refusing">✗ Refuse — vient de voir le
+              prochain Événement</span>
+          </div>
+        </div>
+
+        <!-- Antoine : silencieux -->
+        <div class="recipient-card">
+          <div class="recipient-top">
+            <div>
+              <div class="recipient-name">Antoine</div>
+              <div class="recipient-role">Le Journaliste</div>
+            </div>
+            <div class="recipient-scores">
+              <div class="rscore glory"><span class="val">3</span> ⭐</div>
+              <div class="rscore curse"><span class="val">2</span> 💜</div>
+            </div>
+          </div>
+          <div class="acceptance">
+            <span class="acceptance-status">Silencieux — observe</span>
+            <span class="accept-badge badge-green">Proposer</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <div class="footer-warning">
+        Si aucun joueur n'accepte et qu'aucune Faveur n'est disponible, le Hope
+        reste avec Thomas jusqu'au prochain tour.
+      </div>
+      <div class="footer-actions">
+        <a href="09-scoreboard.html" class="btn btn-ghost">Tableau de bord</a>
+        <a href="04-accumulation.html" class="btn btn-gold">Tour suivant →</a>
+      </div>
+    </footer>
+
+    <div class="nav-hint">
+      <a href="index.html">← Index</a>
+    </div>
+
+  </body>
+</html>

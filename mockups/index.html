@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hope — Maquettes</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --bg: #04040f;
+  --gold: #c8a44a;
+  --gold-light: #f0d070;
+  --diamond: #3070d0;
+  --diamond-glow: rgba(48,112,208,0.5);
+  --text: #d8d0c0;
+  --muted: #60584a;
+  --card-bg: #0a0a1e;
+  --border: rgba(200,164,74,0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  font-family: 'Crimson Text', serif;
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(20,40,100,0.4) 0%, transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+header {
+  text-align: center;
+  padding: 60px 40px 40px;
+  position: relative;
+}
+
+.diamond-icon {
+  width: 60px; height: 60px;
+  background: linear-gradient(135deg, #1a4a9a 0%, #3070d0 40%, #6090e0 55%, #3070d0 70%, #1a4a9a 100%);
+  clip-path: polygon(50% 0%, 100% 35%, 75% 100%, 25% 100%, 0% 35%);
+  margin: 0 auto 24px;
+  box-shadow: 0 0 40px var(--diamond-glow), 0 0 80px rgba(30,70,180,0.3);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 40px var(--diamond-glow), 0 0 80px rgba(30,70,180,0.3); }
+  50% { box-shadow: 0 0 60px rgba(48,112,208,0.8), 0 0 120px rgba(30,70,180,0.5); }
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(200,164,74,0.4);
+}
+
+.subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+.divider {
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 32px auto;
+  opacity: 0.4;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+  padding: 0 60px 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.screen-card {
+  display: block;
+  text-decoration: none;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.screen-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(200,164,74,0.5);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 20px rgba(200,164,74,0.1);
+}
+
+.screen-preview {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.screen-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, var(--card-bg));
+}
+
+.screen-info {
+  padding: 20px 24px 24px;
+}
+
+.screen-num {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+}
+
+.screen-name {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: var(--gold-light);
+  margin: 6px 0 10px;
+  font-weight: 600;
+}
+
+.screen-desc {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Preview backgrounds */
+.bg-home { background: radial-gradient(ellipse at 50% 60%, #0d1a40 0%, #04040f 70%); }
+.bg-setup { background: radial-gradient(ellipse at 30% 50%, #1a1010 0%, #04040f 70%); }
+.bg-seuil { background: radial-gradient(ellipse at 70% 50%, #0a0a20 0%, #04040f 70%); }
+.bg-accum { background: radial-gradient(ellipse at 50% 50%, #0d2040 0%, #04040f 70%); }
+.bg-marche { background: radial-gradient(ellipse at 50% 30%, #1a0a00 0%, #04040f 70%); }
+.bg-event { background: radial-gradient(ellipse at 50% 50%, #1a0010 0%, #04040f 70%); }
+.bg-legs { background: radial-gradient(ellipse at 50% 70%, #0a1a0a 0%, #04040f 70%); }
+.bg-private { background: radial-gradient(ellipse at 50% 50%, #1a1a00 0%, #04040f 70%); }
+.bg-score { background: radial-gradient(ellipse at 50% 50%, #0a0a20 0%, #04040f 70%); }
+.bg-fin { background: radial-gradient(ellipse at 50% 50%, #1a0000 0%, #04040f 70%); }
+</style>
+  </head>
+  <body>
+
+    <header>
+      <div class="diamond-icon"></div>
+      <h1>Hope</h1>
+      <p class="subtitle">Maquettes d'écrans · Diamand Hope</p>
+      <div class="divider"></div>
+    </header>
+
+    <div class="grid">
+
+      <a href="01-accueil.html" class="screen-card">
+        <div class="screen-preview bg-home">💎</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 01</div>
+          <div class="screen-name">Accueil</div>
+          <div class="screen-desc">Titre, tagline et entrée dans la partie. Le
+            diamant vous attend.</div>
+        </div>
+      </a>
+
+      <a href="02-setup-joueurs.html" class="screen-card">
+        <div class="screen-preview bg-setup">🎭</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 02</div>
+          <div class="screen-name">Choix des personnages</div>
+          <div class="screen-desc">Sélection du nombre de joueurs et attribution
+            des rôles.</div>
+        </div>
+      </a>
+
+      <a href="03-setup-seuil.html" class="screen-card">
+        <div class="screen-preview bg-seuil">🃏</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 03</div>
+          <div class="screen-name">Seuil secret</div>
+          <div class="screen-desc">Révélation privée du seuil de malédiction.
+            Passez l'écran.</div>
+        </div>
+      </a>
+
+      <a href="04-accumulation.html" class="screen-card">
+        <div class="screen-preview bg-accum">⚡</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 04</div>
+          <div class="screen-name">Accumulation</div>
+          <div class="screen-desc">Phase 1 — le détenteur gagne Gloire et
+            Malédiction.</div>
+        </div>
+      </a>
+
+      <a href="05-marche-noir.html" class="screen-card">
+        <div class="screen-preview bg-marche">🕯️</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 05</div>
+          <div class="screen-name">Le Marché Noir</div>
+          <div class="screen-desc">Phase 2 — 3 minutes de négociation libre. Le
+            compte à rebours brûle.</div>
+        </div>
+      </a>
+
+      <a href="06-evenement.html" class="screen-card">
+        <div class="screen-preview bg-event">💀</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 06</div>
+          <div class="screen-name">Événement Funeste</div>
+          <div class="screen-desc">Phase 3 — la malédiction se déclenche. Tout
+            peut s'effondrer.</div>
+        </div>
+      </a>
+
+      <a href="07-legs.html" class="screen-card">
+        <div class="screen-preview bg-legs">🤝</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 07</div>
+          <div class="screen-name">Le Legs</div>
+          <div class="screen-desc">Phase 4 — transmission du Hope. Qui veut bien
+            de ce fardeau ?</div>
+        </div>
+      </a>
+
+      <a href="08-vue-privee.html" class="screen-card">
+        <div class="screen-preview bg-private">👁️</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 08</div>
+          <div class="screen-name">Vue privée</div>
+          <div class="screen-desc">Vos secrets, votre seuil, vos ressources.
+            Passez l'écran aux autres.</div>
+        </div>
+      </a>
+
+      <a href="09-scoreboard.html" class="screen-card">
+        <div class="screen-preview bg-score">📊</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 09</div>
+          <div class="screen-name">Tableau de bord</div>
+          <div class="screen-desc">État de la partie, Gloire et Malédictions de
+            chaque joueur.</div>
+        </div>
+      </a>
+
+      <a href="10-fin.html" class="screen-card">
+        <div class="screen-preview bg-fin">👑</div>
+        <div class="screen-info">
+          <div class="screen-num">Écran 10</div>
+          <div class="screen-name">Fin de partie</div>
+          <div class="screen-desc">Décompte final. Le Hope choisit son dernier
+            vainqueur.</div>
+        </div>
+      </a>
+
+    </div>
+
+  </body>
+</html>

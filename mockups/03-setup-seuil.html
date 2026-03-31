@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hope — Seuil Secret</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #04040f;
+  font-family: 'Crimson Text', serif;
+  color: #d8d0c0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Fond très sombre, quasi-total */
+.bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(10,5,30,0.8) 0%, #04040f 100%);
+}
+
+/* Progress joueurs */
+.player-progress {
+  position: fixed;
+  top: 32px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 20;
+}
+
+.prog-dot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #3a3028;
+  transition: all 0.4s;
+}
+
+.prog-dot.done {
+  border-color: rgba(200,164,74,0.15);
+  color: #60584a;
+}
+
+.prog-dot.done .prog-check { color: #c8a44a; }
+
+.prog-dot.current {
+  border-color: rgba(200,164,74,0.4);
+  color: #c8a44a;
+  background: rgba(200,164,74,0.06);
+  box-shadow: 0 0 15px rgba(200,164,74,0.1);
+}
+
+.prog-check { font-size: 10px; }
+
+/* Contenu central */
+.center {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Instruction */
+.instruction {
+  margin-bottom: 48px;
+}
+
+.pass-text {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.5em;
+  color: #4a4038;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.player-name {
+  font-family: 'Cinzel', serif;
+  font-size: 36px;
+  font-weight: 600;
+  background: linear-gradient(180deg, #f0d070 0%, #c8a44a 60%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.05em;
+}
+
+.player-role {
+  font-size: 16px;
+  font-style: italic;
+  color: #60584a;
+  margin-top: 6px;
+}
+
+/* Enveloppe / carte secrète */
+.envelope-zone {
+  position: relative;
+  width: 240px;
+  height: 340px;
+  margin: 0 auto 40px;
+  perspective: 800px;
+}
+
+/* Carte cachet */
+.seal-card {
+  width: 240px;
+  height: 340px;
+  border: 1px solid rgba(200,164,74,0.25);
+  background: linear-gradient(160deg, #0d0d22 0%, #080818 40%, #0a0a1e 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  transform-style: preserve-3d;
+}
+
+.seal-card:hover {
+  border-color: rgba(200,164,74,0.5);
+  box-shadow: 0 0 40px rgba(200,164,74,0.1), 0 20px 60px rgba(0,0,0,0.5);
+  transform: translateY(-4px) rotateY(3deg);
+}
+
+/* Filigrane de la carte */
+.card-watermark {
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(200,164,74,0.08);
+  pointer-events: none;
+}
+
+.card-corner {
+  position: absolute;
+  width: 20px; height: 20px;
+  border-color: rgba(200,164,74,0.25);
+  border-style: solid;
+}
+.card-corner.tl { top: 20px; left: 20px; border-width: 1px 0 0 1px; }
+.card-corner.tr { top: 20px; right: 20px; border-width: 1px 1px 0 0; }
+.card-corner.bl { bottom: 20px; left: 20px; border-width: 0 0 1px 1px; }
+.card-corner.br { bottom: 20px; right: 20px; border-width: 0 1px 1px 0; }
+
+/* Cachet de cire central */
+.wax-seal {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 35% 30%, #8b0000 0%, #5a0000 40%, #3a0000 70%, #1a0000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(100,0,0,0.4), inset 0 -2px 8px rgba(0,0,0,0.5);
+  margin-bottom: 24px;
+}
+
+.wax-seal::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(200,50,50,0.2);
+}
+
+.wax-icon {
+  font-size: 36px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+
+.card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: #c8a44a;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  font-style: italic;
+  color: #4a4038;
+  text-align: center;
+  padding: 0 24px;
+  line-height: 1.5;
+}
+
+/* Texte "Appuyez pour révéler" */
+.reveal-hint {
+  position: absolute;
+  bottom: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #4a4038;
+  font-style: italic;
+  white-space: nowrap;
+  animation: hint-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ---- État révélé (montré comme second état via classe .revealed) ---- */
+.revealed-card {
+  display: none;
+  width: 240px;
+  height: 340px;
+  border: 1px solid rgba(120,60,180,0.4);
+  background: linear-gradient(160deg, #0e0a20 0%, #080818 60%, #0a0820 100%);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 40px rgba(100,30,200,0.2);
+}
+
+.threshold-number {
+  font-family: 'Cinzel', serif;
+  font-size: 96px;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(180deg, #a060e0 0%, #6030b0 60%, #3a1880 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(120,60,200,0.5));
+}
+
+.threshold-label {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.35em;
+  color: #7040b0;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.threshold-desc {
+  font-size: 14px;
+  color: #60504a;
+  font-style: italic;
+  text-align: center;
+  padding: 16px 20px 0;
+  line-height: 1.5;
+}
+
+/* Toggle visuel */
+.state-toggle {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.toggle-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  padding: 8px 20px;
+  border: 1px solid rgba(200,164,74,0.2);
+  color: #4a4038;
+  background: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  border-color: rgba(200,164,74,0.5);
+  color: #c8a44a;
+  background: rgba(200,164,74,0.06);
+}
+
+/* Footer */
+.footer {
+  position: fixed;
+  bottom: 32px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 20;
+}
+
+.btn-next {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  padding: 14px 40px;
+  background: rgba(200,164,74,0.08);
+  border: 1px solid rgba(200,164,74,0.35);
+  color: #c8a44a;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+.btn-next:hover {
+  background: rgba(200,164,74,0.15);
+  border-color: rgba(200,164,74,0.6);
+}
+
+.nav-hint {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  font-size: 12px;
+  color: #3a3030;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.15em;
+  z-index: 30;
+}
+
+.nav-hint a { color: #5a5040; text-decoration: none; }
+.nav-hint a:hover { color: #c8a44a; }
+</style>
+  </head>
+  <body>
+
+    <div class="bg"></div>
+
+    <div class="player-progress">
+      <div class="prog-dot done"><span class="prog-check">✓</span> Joueur
+        1</div>
+      <div class="prog-dot done"><span class="prog-check">✓</span> Joueur
+        2</div>
+      <div class="prog-dot current">→ Joueur 3</div>
+      <div class="prog-dot">Joueur 4</div>
+      <div class="prog-dot">Joueur 5</div>
+    </div>
+
+    <div class="center">
+
+      <div class="instruction">
+        <p class="pass-text">Passez l'écran à</p>
+        <div class="player-name">Isabelle</div>
+        <div class="player-role">Le Receleur</div>
+      </div>
+
+      <!-- Affichage des deux états -->
+      <div class="state-toggle">
+        <button class="toggle-btn active" onclick="showState('sealed')">Carte
+          scellée</button>
+        <button class="toggle-btn" onclick="showState('revealed')">Carte
+          révélée</button>
+      </div>
+
+      <!-- État scellé -->
+      <div class="envelope-zone" id="state-sealed">
+        <div class="seal-card">
+          <div class="card-watermark">
+            <div class="card-corner tl"></div>
+            <div class="card-corner tr"></div>
+            <div class="card-corner bl"></div>
+            <div class="card-corner br"></div>
+          </div>
+          <div class="wax-seal">
+            <div class="wax-icon">💎</div>
+          </div>
+          <div class="card-title">Seuil de Malédiction</div>
+          <div class="card-subtitle">Ne révélez à personne. Gardez-la face
+            cachée devant vous.</div>
+        </div>
+        <div class="reveal-hint">Appuyez pour révéler</div>
+      </div>
+
+      <!-- État révélé -->
+      <div class="envelope-zone" id="state-revealed" style="display:none;">
+        <div class="revealed-card" style="display:flex;">
+          <div class="card-corner tl"
+            style="position:absolute;top:16px;left:16px;width:16px;height:16px;border:1px solid rgba(120,60,180,0.3);border-right:none;border-bottom:none;"></div>
+          <div class="card-corner tr"
+            style="position:absolute;top:16px;right:16px;width:16px;height:16px;border:1px solid rgba(120,60,180,0.3);border-left:none;border-bottom:none;"></div>
+          <div class="card-corner bl"
+            style="position:absolute;bottom:16px;left:16px;width:16px;height:16px;border:1px solid rgba(120,60,180,0.3);border-right:none;border-top:none;"></div>
+          <div class="card-corner br"
+            style="position:absolute;bottom:16px;right:16px;width:16px;height:16px;border:1px solid rgba(120,60,180,0.3);border-left:none;border-top:none;"></div>
+          <div class="threshold-number">5</div>
+          <div class="threshold-label">Jetons Malédiction</div>
+          <div class="threshold-desc">Vous subirez un Événement Funeste lorsque
+            vous atteindrez ce seuil. Ne le révélez pas.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <a href="04-accumulation.html" class="btn-next">Commencer la partie →</a>
+    </footer>
+
+    <div class="nav-hint">
+      <a href="index.html">← Index</a>
+    </div>
+
+    <script>
+function showState(s) {
+  document.getElementById('state-sealed').style.display = s === 'sealed' ? 'block' : 'none';
+  document.getElementById('state-revealed').style.display = s === 'revealed' ? 'block' : 'none';
+  document.querySelectorAll('.toggle-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && s==='sealed') || (i===1 && s==='revealed'));
+  });
+}
+</script>
+
+  </body>
+</html>

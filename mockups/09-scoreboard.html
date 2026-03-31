@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hope — Tableau de Bord</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #03030c;
+  --gold: #c8a44a;
+  --gold-light: #f0d070;
+  --text: #d8d0c0;
+  --muted: #60584a;
+  --surface: #070712;
+  --border: rgba(200,164,74,0.15);
+  --diamond: #3070d0;
+  --curse: #7020c0;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Crimson Text', serif;
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-title { font-family: 'Cinzel', serif; }
+.header-title .pre { font-size: 11px; letter-spacing: 0.4em; color: var(--muted); text-transform: uppercase; }
+.header-title h2  { font-size: 22px; font-weight: 600; color: var(--gold); margin-top: 4px; }
+
+.header-meta {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.meta-item { text-align: center; }
+.meta-val {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  display: block;
+}
+.meta-label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  display: block;
+  margin-top: 2px;
+}
+
+.meta-sep { width: 1px; height: 32px; background: var(--border); }
+
+.deck-warning {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding: 8px 18px;
+  border: 1px solid rgba(160,60,60,0.4);
+  color: #c06060;
+  background: rgba(60,0,0,0.2);
+  text-transform: uppercase;
+}
+
+/* Tableau principal */
+.main {
+  flex: 1;
+  padding: 40px 48px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+}
+
+/* Tableau des scores */
+.scores-table {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr 1fr 1fr 1fr;
+  gap: 0;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.th {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.th.left { text-align: left; padding-left: 0; }
+
+/* Ligne joueur */
+.player-line {
+  background: var(--surface);
+  border: 1px solid rgba(200,164,74,0.1);
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr 1fr 1fr 1fr;
+  gap: 0;
+  align-items: center;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.player-line:hover {
+  border-color: rgba(200,164,74,0.3);
+  background: rgba(200,164,74,0.02);
+}
+
+.player-line.leader {
+  border-color: rgba(200,164,74,0.35);
+  background: rgba(200,164,74,0.04);
+}
+
+.player-line.leader::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, transparent, var(--gold), transparent);
+}
+
+.player-line.holder {
+  border-color: rgba(48,112,208,0.35);
+}
+
+.player-line.holder::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, transparent, var(--diamond), transparent);
+}
+
+.player-line.danger-zone {
+  border-color: rgba(160,20,20,0.35);
+}
+
+.player-line.danger-zone::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, transparent, #cc3030, transparent);
+  animation: danger-flash 1.5s ease-in-out infinite;
+}
+
+@keyframes danger-flash {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* Cellules */
+.cell {
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.cell.left { text-align: left; padding-left: 20px; }
+
+/* Identité */
+.cell-identity { display: flex; align-items: center; gap: 12px; }
+
+.player-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+.player-dot.blue { background: var(--diamond); box-shadow: 0 0 6px rgba(48,112,208,0.7); }
+.player-dot.gold { background: var(--gold); box-shadow: 0 0 6px rgba(200,164,74,0.7); }
+.player-dot.red  { background: #cc3030; box-shadow: 0 0 6px rgba(200,30,30,0.7); animation: danger-flash 1.5s ease-in-out infinite; }
+
+.identity-info { flex: 1; }
+.identity-name {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--text);
+  display: block;
+}
+
+.identity-role {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+}
+
+/* Valeurs */
+.val-glory {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.val-glory.leader-score { color: var(--gold-light); filter: drop-shadow(0 0 8px rgba(200,164,74,0.4)); }
+
+.val-curse {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--curse);
+}
+
+.val-curse.danger { color: #cc3030; }
+
+/* Seuil — masqué ou révélé */
+.val-threshold {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.threshold-hidden { color: #3a3028; }
+.threshold-revealed { color: #9040c0; }
+
+/* Indicateur de danger relatif */
+.risk-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 80px;
+}
+
+.risk-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.risk-fill.low    { background: rgba(60,160,60,0.6); }
+.risk-fill.medium { background: rgba(200,164,74,0.7); }
+.risk-fill.high   { background: rgba(200,60,60,0.8); animation: risk-pulse 1s ease-in-out infinite; }
+
+@keyframes risk-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Historique Hope */
+.hope-history {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hope-dot {
+  width: 14px; height: 14px;
+  border-radius: 2px;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hope-dot.held  { background: rgba(48,112,208,0.3); border: 1px solid rgba(48,112,208,0.4); }
+.hope-dot.empty { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+.hope-dot.event { background: rgba(160,30,30,0.3); border: 1px solid rgba(160,30,30,0.4); }
+
+/* =========  Panneau droit ========= */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Deck d'événements */
+.deck-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.block-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(200,164,74,0.1);
+}
+
+.deck-visual {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.deck-card {
+  width: 28px;
+  background: linear-gradient(180deg, #0e0810 0%, #080008 100%);
+  border: 1px solid rgba(160,30,30,0.25);
+  border-radius: 2px;
+  transition: height 0.5s ease;
+}
+
+.deck-count {
+  font-family: 'Cinzel', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: #8b4040;
+}
+
+.deck-of {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.deck-progress {
+  margin-top: 12px;
+  height: 4px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.deck-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(160,30,30,0.4), rgba(200,50,50,0.7));
+  border-radius: 2px;
+}
+
+/* Podium */
+.podium-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.podium-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.podium-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.rank {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 900;
+  width: 30px;
+  text-align: center;
+}
+
+.rank-1 { color: var(--gold-light); }
+.rank-2 { color: #c0c0c0; }
+.rank-3 { color: #c08040; }
+
+.podium-name { flex: 1; font-family: 'Cinzel', serif; font-size: 14px; color: var(--text); }
+.podium-val  { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold); }
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px 48px;
+  border-top: 1px solid var(--border);
+  gap: 12px;
+}
+
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  padding: 12px 28px;
+  text-decoration: none;
+  text-transform: uppercase;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-ghost { border-color: rgba(255,255,255,0.08); color: var(--muted); background: none; }
+.btn-ghost:hover { border-color: rgba(200,164,74,0.3); color: var(--text); }
+
+.btn-gold {
+  border-color: rgba(200,164,74,0.45);
+  color: var(--gold);
+  background: rgba(200,164,74,0.08);
+}
+.btn-gold:hover { background: rgba(200,164,74,0.15); border-color: rgba(200,164,74,0.7); color: var(--gold-light); }
+
+.nav-hint {
+  position: fixed;
+  top: 24px;
+  right: 48px;
+  font-size: 12px;
+  color: #3a3030;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.15em;
+  z-index: 30;
+}
+.nav-hint a { color: #5a5040; text-decoration: none; }
+.nav-hint a:hover { color: var(--gold); }
+</style>
+  </head>
+  <body>
+
+    <div class="header">
+      <div class="header-title">
+        <div class="pre">État de la partie</div>
+        <h2>Tableau de Bord</h2>
+      </div>
+
+      <div class="header-meta">
+        <div class="meta-item">
+          <span class="meta-val">3</span>
+          <span class="meta-label">Tour actuel</span>
+        </div>
+        <div class="meta-sep"></div>
+        <div class="meta-item">
+          <span class="meta-val">8</span>
+          <span class="meta-label">Tours total</span>
+        </div>
+        <div class="meta-sep"></div>
+        <div class="meta-item">
+          <span class="meta-val">5</span>
+          <span class="meta-label">Joueurs</span>
+        </div>
+        <div class="deck-warning">⚠ 18 événements restants</div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- Tableau principal -->
+      <div class="scores-table">
+
+        <div class="table-header">
+          <div class="th left">Joueur</div>
+          <div class="th">Gloire</div>
+          <div class="th">Malédiction</div>
+          <div class="th">Seuil</div>
+          <div class="th">Risque</div>
+          <div class="th">Historique</div>
+        </div>
+
+        <!-- Isabelle — leader -->
+        <div class="player-line leader">
+          <div class="cell left">
+            <div class="cell-identity">
+              <div class="player-dot gold"></div>
+              <div class="identity-info">
+                <span class="identity-name">Isabelle</span>
+                <span class="identity-role">Le Receleur</span>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><span class="val-glory leader-score">6</span></div>
+          <div class="cell"><span class="val-curse">1</span></div>
+          <div class="cell"><span
+              class="val-threshold threshold-hidden">?</span></div>
+          <div class="cell">
+            <div class="risk-bar"><div class="risk-fill low"
+                style="width:20%"></div></div>
+          </div>
+          <div class="cell">
+            <div class="hope-history">
+              <div class="hope-dot held" title="Tour 1">💎</div>
+              <div class="hope-dot empty" title="Tour 2"></div>
+              <div class="hope-dot empty" title="Tour 3"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chloé -->
+        <div class="player-line">
+          <div class="cell left">
+            <div class="cell-identity">
+              <div class="player-dot"></div>
+              <div class="identity-info">
+                <span class="identity-name">Chloé</span>
+                <span class="identity-role">La Médium</span>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><span class="val-glory">5</span></div>
+          <div class="cell"><span class="val-curse">0</span></div>
+          <div class="cell"><span
+              class="val-threshold threshold-hidden">?</span></div>
+          <div class="cell">
+            <div class="risk-bar"><div class="risk-fill low"
+                style="width:5%"></div></div>
+          </div>
+          <div class="cell">
+            <div class="hope-history">
+              <div class="hope-dot empty"></div>
+              <div class="hope-dot held" title="Tour 2">💎</div>
+              <div class="hope-dot empty"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Antoine -->
+        <div class="player-line">
+          <div class="cell left">
+            <div class="cell-identity">
+              <div class="player-dot"></div>
+              <div class="identity-info">
+                <span class="identity-name">Antoine</span>
+                <span class="identity-role">Le Journaliste</span>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><span class="val-glory">3</span></div>
+          <div class="cell"><span class="val-curse">2</span></div>
+          <div class="cell"><span
+              class="val-threshold threshold-hidden">?</span></div>
+          <div class="cell">
+            <div class="risk-bar"><div class="risk-fill medium"
+                style="width:40%"></div></div>
+          </div>
+          <div class="cell">
+            <div class="hope-history">
+              <div class="hope-dot empty"></div>
+              <div class="hope-dot empty"></div>
+              <div class="hope-dot empty"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thomas — détenteur, seuil révélé -->
+        <div class="player-line holder">
+          <div class="cell left">
+            <div class="cell-identity">
+              <div class="player-dot blue"></div>
+              <div class="identity-info">
+                <span class="identity-name" style="color:#80b0ff">Thomas
+                  💎</span>
+                <span class="identity-role">Le Marchand</span>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><span class="val-glory"
+              style="color:#80b0ff">5</span></div>
+          <div class="cell"><span class="val-curse"
+              style="color:#9060c0">4</span></div>
+          <div class="cell"><span class="val-threshold threshold-revealed">5
+              !</span></div>
+          <div class="cell">
+            <div class="risk-bar"><div class="risk-fill high"
+                style="width:80%"></div></div>
+          </div>
+          <div class="cell">
+            <div class="hope-history">
+              <div class="hope-dot empty"></div>
+              <div class="hope-dot empty"></div>
+              <div class="hope-dot event" title="Événement!">⚡</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Marcus — danger -->
+        <div class="player-line danger-zone">
+          <div class="cell left">
+            <div class="cell-identity">
+              <div class="player-dot red"></div>
+              <div class="identity-info">
+                <span class="identity-name" style="color:#e08080">Marcus</span>
+                <span class="identity-role">L'Héritier Ruiné</span>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><span class="val-glory"
+              style="color:#a07070">2</span></div>
+          <div class="cell"><span class="val-curse danger">2</span></div>
+          <div class="cell"><span class="val-threshold"
+              style="color:#cc4444;font-size:15px">3 (fixe)</span></div>
+          <div class="cell">
+            <div class="risk-bar"><div class="risk-fill high"
+                style="width:66%"></div></div>
+          </div>
+          <div class="cell">
+            <div class="hope-history">
+              <div class="hope-dot event" title="Événement!">⚡</div>
+              <div class="hope-dot held" title="Tour 2">💎</div>
+              <div class="hope-dot empty"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Panneau droit -->
+      <div class="side-panel">
+
+        <!-- Deck -->
+        <div class="deck-block">
+          <div class="block-title">Événements Funestes</div>
+          <div class="deck-visual">
+            <div class="deck-card" style="height:60px"></div>
+            <div class="deck-card" style="height:55px"></div>
+            <div class="deck-card" style="height:52px"></div>
+            <div class="deck-card" style="height:49px"></div>
+            <div class="deck-card" style="height:46px"></div>
+          </div>
+          <div class="deck-count">18</div>
+          <div class="deck-of">restantes sur 24</div>
+          <div class="deck-progress">
+            <div class="deck-progress-fill" style="width:25%"></div>
+          </div>
+        </div>
+
+        <!-- Podium -->
+        <div class="podium-block">
+          <div class="block-title">Classement actuel</div>
+          <div class="podium-rows">
+            <div class="podium-row">
+              <div class="rank rank-1">1</div>
+              <div class="podium-name">Isabelle</div>
+              <div class="podium-val">6</div>
+            </div>
+            <div class="podium-row">
+              <div class="rank rank-2">2</div>
+              <div class="podium-name">Chloé</div>
+              <div class="podium-val">5</div>
+            </div>
+            <div class="podium-row">
+              <div class="rank rank-3">3</div>
+              <div class="podium-name">Thomas</div>
+              <div class="podium-val">5</div>
+            </div>
+            <div class="podium-row">
+              <div class="rank" style="color:var(--muted)">4</div>
+              <div class="podium-name" style="color:var(--muted)">Antoine</div>
+              <div class="podium-val" style="color:var(--muted)">3</div>
+            </div>
+            <div class="podium-row">
+              <div class="rank" style="color:var(--muted)">5</div>
+              <div class="podium-name" style="color:var(--muted)">Marcus</div>
+              <div class="podium-val" style="color:var(--muted)">2</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <a href="index.html" class="btn btn-ghost">← Accueil maquettes</a>
+      <a href="04-accumulation.html" class="btn btn-gold">Tour 4 →</a>
+    </footer>
+
+    <div class="nav-hint">
+      <a href="index.html">← Index</a>
+    </div>
+
+  </body>
+</html>
