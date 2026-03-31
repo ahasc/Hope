@@ -1,8 +1,5 @@
-[phases.setup]
-nixPkgs = ["nodejs_20"]
-
 [build]
 builder = "nixpacks"
 
 [deploy]
-startCommand = "node server.js"
+startCommand = "npm run start"
