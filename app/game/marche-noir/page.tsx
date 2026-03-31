@@ -28,10 +28,9 @@ export default function MarcheNoirPage() {
   const isHost = useIsHost();
   const playerId = usePlayerId();
 
+  const alive = players.filter((p) => p.isAlive);
   const isReady = !!playerId && silentOffers[playerId] === '__ready__';
   const readyCount = alive.filter((p) => silentOffers[p.id] === '__ready__').length;
-
-  const alive = players.filter((p) => p.isAlive);
   const marchand = players.find((p) => p.character === 'marchand' && p.isAlive);
   const ownPlayer = alive.find((p) => p.id === playerId);
   const isStarted = !!marketTimerStart;

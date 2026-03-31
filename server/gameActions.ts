@@ -197,7 +197,7 @@ function resolveAccumulation(state: GameState): GameState {
 
   const holder = updated.find((p) => p.isHopeHolder);
   const triggered = holder && holder.curseTokens >= holder.threshold;
-  const isAristocrateImmune = holder?.character === 'aristocrate' && !holder.aristocrateEventImmunityUsed;
+  const isAristocrateImmune = !!holder && holder.character === 'aristocrate' && !holder.aristocrateEventImmunityUsed;
   const base = { ...state, players: updated };
 
   if (!triggered) return { ...base, phase: 'marche-noir' };

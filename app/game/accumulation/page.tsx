@@ -33,6 +33,7 @@ export default function AccumulationPage() {
   const isAristocrateImmune = holder.character === 'aristocrate' && !holder.aristocrateEventImmunityUsed;
 
   function handleContinue() {
+    if (!holder) return;
     actions.resolveAccumulation();
     if (willTrigger && !isAristocrateImmune && !holder.isHidden) {
       router.push('/game/evenement');
